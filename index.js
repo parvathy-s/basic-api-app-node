@@ -79,7 +79,10 @@ express()
   })
   .get('/try', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c`);
-    res.json(rows);
+    //res.json(rows);
+    res.render('pages/db',{
+              results : rows
+            });
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
