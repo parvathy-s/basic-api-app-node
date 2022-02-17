@@ -14,6 +14,27 @@ const db = new Pool({
   }
 });
 
+//swagger
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const options = {
+  definition: {
+    openapi : '3.0.0',
+    info : {
+      title: 'Heroku Connect Data Fetch',
+      version: '1.0.0'
+    },
+    servers: [
+      {
+        url: 'http://localhost:5000/'
+      }
+    ]
+  },
+  apis: ['./index.js']
+}
+
+const swaggerSpec = swaggerJSDoc(options)
 
 var bodyParser = require('body-parser');
 var pg = require('pg');
@@ -23,9 +44,20 @@ var pg = require('pg');
 express()
   .use(express.static(path.join(__dirname, 'public')))
   .use(cors())
+  .use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
   .use(bodyParser.json())
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
+  /**
+   * @swagger
+   * /:
+   *  get:
+   *      summary: This is the home page
+   *      description: This is the home page
+   *      responses:
+   *          200:
+   *              description: Status OK
+   */
   .get('/', (req, res) => res.render('pages/index'))
   .get('/db', (req, res) => {
     var dbOpts = {
@@ -77,12 +109,41 @@ express()
       // );
   });
   })
+
+  /**
+   * @swagger
+   *  components:
+   *      schema:
+   *          Example: 
+   *                type: object
+   *                properties:
+   *                    id:
+   *                        type: integer
+   *                    name:
+   *                        type: string
+   *                    description__c:
+   *                        type: string
+   */
+  /**
+   * @swagger
+   * /try:
+   *  get:
+   *      summary: Fetch data from Example SF Object
+   *      description: Fetch example data from Heroku Postgres
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *              content:
+   *                  application/json: 
+   *                      schema:
+   *                          type: array
+   *                          items:
+   *                              $ref: '#components/schema/Example'
+   */
   .get('/try', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c`);
-    //res.json(rows);
-    res.render('pages/db',{
-              results : rows
-            });
+    res.json(rows);
+    
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
