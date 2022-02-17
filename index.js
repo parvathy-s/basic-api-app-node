@@ -27,7 +27,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:5000/'
+        url: 'https://basic-api-app-node.herokuapp.com/'
       }
     ]
   },
