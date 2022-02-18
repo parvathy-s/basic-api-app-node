@@ -14,6 +14,9 @@ const db = new Pool({
   }
 });
 
+const users = [
+  { username: "abin1", password: "abc"}
+];
 //swagger
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -38,11 +41,13 @@ const swaggerSpec = swaggerJSDoc(options)
 
 var bodyParser = require('body-parser');
 var pg = require('pg');
+const { user } = require('pg/lib/defaults');
 
 
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
+  .use(express.urlencoded({ extended: false}))
   .use(cors())
   .use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
   .use(bodyParser.json())
@@ -59,56 +64,6 @@ express()
    *              description: Status OK
    */
   .get('/', (req, res) => res.render('pages/index'))
-  .get('/db', (req, res) => {
-    var dbOpts = {
-      connectionString: process.env.DATABASE_URL,
-      ssl : true
-    }
-    const client = new Client(dbOpts);
-    // client.on('error', e => {
-    //   console.error('Database error', e);
-    //   client = null;
-    // });
-    client.connect(err =>{
-      if(err)
-      console.error(err);
-      else
-      res.send("set");
-    });
-    // client.query('SELECT id, name, Description__c FROM salesforce.example__c', (err, dbRes) => {
-    //       if (err) throw err;
-    //       res.render('pages/db',{
-    //         results : dbRes.rows
-    //       });
-    //       client.end();
-    //     });
-    client.end();
-  })
-  .get('/fetch',(req,res)=>{
-    var config = {
-      connectionString: process.env.DATABASE_URL,
-      ssl : true
-    }
-    const pool = new pg.Pool(config);
-    pool.connect(function (err, conn, done) {
-      // watch for any connect issues
-      if (err) console.log(err);
-      else
-      console.log("connected");
-      // conn.query(
-      //     'SELECT id, name, Description__c FROM salesforce.example__c',
-      //     function(err, result) {
-      //         if (err != null || result.rowCount == 0) {
-      //             res.status(400).json({error: err.message});
-      //         }
-      //         else {
-      //             done();
-      //             res.json(result);
-      //         }
-      //     }
-      // );
-  });
-  })
 
   /**
    * @swagger
@@ -177,6 +132,12 @@ express()
     const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
     res.json(rows);
     
+  })
+  .post('/get_user',(req,res)=>{
+    if(req.body.username == users.username && req.body.password == users.password)
+    res.status(200).send("SUCCESS");
+    else
+    res.status(401).send("ERROR");
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
