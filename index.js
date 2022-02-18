@@ -145,6 +145,11 @@ express()
     res.json(rows);
     
   })
+  .get('/user_det', async (req,res) =>{
+    const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
+    res.json(rows);
+    
+  })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
   
