@@ -145,6 +145,34 @@ express()
     res.json(rows);
     
   })
+  /**
+   * @swagger
+   * /try/{id}:
+   *  get:
+   *      summary: Fetch specific from Example SF Object
+   *      description: Fetch example data by ID from Heroku Postgres
+   *      parameters:
+   *           - in: path
+   *             name: id
+   *             required: true
+   *             description: Numeric ID required
+   *             schema:
+   *                type: integer
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *              content:
+   *                  application/json: 
+   *                      schema:
+   *                          type: array
+   *                          items:
+   *                              $ref: '#components/schema/Example'
+   */
+  .get('/try/:id', async (req,res) =>{
+    var id = req.params.id;
+    const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c where id = ${id}`);
+    res.json(rows);
+  })
   .get('/user_det', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
     res.json(rows);
