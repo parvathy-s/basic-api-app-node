@@ -3,7 +3,7 @@
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
-const { Client } = require('pg');
+
 
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -15,11 +15,13 @@ const db = new Pool({
 });
 
 const users = [
-  { username: "abin1", password: "abc"}
+  { username: "abin1", password: "abc"},
+  { username: "parvathy4", password: "abc"}
 ];
 //swagger
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const { off } = require('process');
 
 const options = {
   definition: {
@@ -40,10 +42,6 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options)
 
 var bodyParser = require('body-parser');
-var pg = require('pg');
-const { user } = require('pg/lib/defaults');
-
-
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
@@ -51,6 +49,7 @@ express()
   .use(cors())
   .use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
   .use(bodyParser.json())
+  .use(express.json())
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   /**
@@ -134,10 +133,11 @@ express()
     
   })
   .post('/get_user',(req,res)=>{
-    if(req.body.username == users.username && req.body.password == users.password)
-    res.status(200).send("SUCCESS");
-    else
+    const user = users.find(c => c.username === req.body.username && c.password === req.body.password);
+    if(!user)
     res.status(401).send("ERROR");
+    else
+    res.status(200).send("SUCCESS");
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
