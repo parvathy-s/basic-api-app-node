@@ -132,6 +132,37 @@ express()
     res.json(rows);
     
   })
+  /**
+   * @swagger
+   *  components:
+   *      schemas:
+   *          User: 
+   *                type: object
+   *                properties:
+   *                    username:
+   *                        type: string
+   *                    password:
+   *                        type: string
+   */
+  /**
+  /**
+   * @swagger
+   * /get_user:
+   *  post:
+   *      summary: Login validation using static values
+   *      description: Check login 
+   *      requestBody:
+   *          required: true
+   *          content:
+   *              application/json:
+   *                  schema:
+   *                     $ref: '#components/schemas/User' 
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *          401:
+   *              description: Error
+   */
   .post('/get_user',(req,res)=>{
     const user = users.find(c => c.username === req.body.username && c.password === req.body.password);
     if(!user)
