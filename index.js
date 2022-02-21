@@ -126,13 +126,13 @@ express()
    */
   .get('/try/:id', async (req,res) =>{
     var id = req.params.id;
-    const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c where id = ${id}`);
+    const { rows } = await db.query(`SELECT id, name, Description__c, extid__c FROM salesforce.example__c where id = ${id}`);
     res.json(rows);
   })
   /**
    * @swagger
    *  components:
-   *      schema:
+   *      schemas:
    *          Example1: 
    *                type: object
    *                properties:
@@ -154,22 +154,23 @@ express()
    *          content:
    *              application/json:
    *                  schema:
-   *                     $ref: '#components/schema/Example1' 
+   *                     $ref: '#components/schemas/Example1' 
    *      responses:
    *          200:
    *              description: Status OK
    *          401:
    *              description: Error
    */
-  .post('/try', async (req,res) =>{
-    var query = `INSERT INTO salesforce.example__c(name, description__c, extid__c) values (${req.body.name.trim()}, ${req.body.description__c.trim()}, ${req.body.extid__c.trim()})`;
-    await db.query(query, (err, res) => {
-      if (err) {
-        console.log(err.stack)
-      } else {
-        console.log(res.rows[0])
-      }
-    })
+  .post('/try',(req,res) =>{
+    //var query = `INSERT INTO salesforce.example__c(name, description__c, extid__c) values (${req.body.name.trim()}, ${req.body.description__c.trim()}, ${req.body.extid__c.trim()})`;
+    db.query('INSERT INTO salesforce.example__c(name, description__c, extid__c) values ($1, $2, $3)',
+      [req.body.name.trim(), req.body.description__c.trim(), req.body.extid__c.trim()], (err, result) => {
+        if (err) {
+          res.send(err.stack);
+        } else {
+          res.send("Inserted");
+        }
+      })
   }) 
   .get('/user_det', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
