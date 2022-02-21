@@ -15,8 +15,8 @@ const db = new Pool({
 });
 
 const users = [
-  { username: "abin1", password: "abc"},
-  { username: "parvathy4", password: "abc"}
+  { username: "abin1", password: "abc", firstname: "Abin", lastname: "Tom", email: "abin@gmail.com", phone: 1234567890},
+  { username: "parvathy4", password: "abc", firstname: "Parvathy", lastname: "Sajeev", email: "parvathy@gmail.com", phone: 7306204018}
 ];
 //swagger
 const swaggerJSDoc = require('swagger-jsdoc');
@@ -32,7 +32,7 @@ const options = {
     },
     servers: [
       {
-        url: 'https://basic-api-app-node.herokuapp.com/'
+        url: 'http://localhost:5000/'
       }
     ]
   },
@@ -213,7 +213,7 @@ express()
     if(!user)
     res.status(401).send("ERROR");
     else
-    res.status(200).send("SUCCESS");
+    res.status(200).json(user);
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
