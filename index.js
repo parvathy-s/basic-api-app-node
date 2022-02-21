@@ -77,6 +77,8 @@ express()
    *                        type: string
    *                    description__c:
    *                        type: string
+   *                    extid__c:
+   *                        type: string
    */
   /**
    * @swagger
@@ -95,7 +97,7 @@ express()
    *                              $ref: '#components/schema/Example'
    */
   .get('/try', async (req,res) =>{
-    const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c`);
+    const { rows } = await db.query(`SELECT id, name, Description__c, extid__c FROM salesforce.example__c`);
     res.json(rows);
     
   })
@@ -127,6 +129,48 @@ express()
     const { rows } = await db.query(`SELECT id, name, Description__c FROM salesforce.example__c where id = ${id}`);
     res.json(rows);
   })
+  /**
+   * @swagger
+   *  components:
+   *      schema:
+   *          Example1: 
+   *                type: object
+   *                properties:
+   *                    name:
+   *                        type: string
+   *                    description__c:
+   *                        type: string
+   *                    extid__c:
+   *                        type: string
+   */
+  /**
+   * @swagger
+   * /try:
+   *  post:
+   *      summary: Create new Example values
+   *      description: Post test 
+   *      requestBody:
+   *          required: true
+   *          content:
+   *              application/json:
+   *                  schema:
+   *                     $ref: '#components/schema/Example1' 
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *          401:
+   *              description: Error
+   */
+  .post('/try', async (req,res) =>{
+    var query = `INSERT INTO salesforce.example__c(name, description__c, extid__c) values (${req.body.name.trim()}, ${req.body.description__c.trim()}, ${req.body.extid__c.trim()})`;
+    await db.query(query, (err, res) => {
+      if (err) {
+        console.log(err.stack)
+      } else {
+        console.log(res.rows[0])
+      }
+    })
+  }) 
   .get('/user_det', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
     res.json(rows);
