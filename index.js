@@ -172,6 +172,70 @@ express()
         }
       })
   }) 
+    /**
+   * @swagger
+   * /try/del/{id}:
+   *  post:
+   *      summary: Delet existing Example records
+   *      description: Delet test 
+   *      parameters:
+   *           - in: path
+   *             name: id
+   *             required: true
+   *             description: Unique ID required
+   *             schema:
+   *                type: string
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *          401:
+   *              description: Error
+   */
+  .post('/try/del/:id', (req,res) =>{
+    db.query('DELETE from salesforce.example__c where extid__c= $1',
+    [req.params.id], (err, result) => {
+      if (err) {
+        res.send("Cannot del");
+      } else {
+        res.status(200).send("Deleted");
+      }
+    })
+  })
+   /**
+   * @swagger
+   * /try/{id}:
+   *  put:
+   *      summary: Update existing Example records
+   *      description: Put test 
+   *      parameters:
+   *           - in: path
+   *             name: id
+   *             required: true
+   *             description: Unique ID required
+   *             schema:
+   *                type: string
+   *      requestBody:
+   *          required: true
+   *          content:
+   *              application/json:
+   *                  schema:
+   *                     $ref: '#components/schemas/Example1' 
+   *      responses:
+   *          200:
+   *              description: Status OK
+   *          401:
+   *              description: Error
+   */
+  .put('/try/:id',(req,res) =>{
+    db.query('UPDATE salesforce.example__c set name= $1, description__c= $2 where extid__c= $3',
+      [req.body.name.trim(), req.body.description__c.trim(), req.params.id], (err, result) => {
+        if (err) {
+          res.send(err.stack);
+        } else {
+          res.send("Updated");
+        }
+      })
+  })
   .get('/user_det', async (req,res) =>{
     const { rows } = await db.query(`SELECT id, name, username__c, password__c, email__c, phone__c FROM salesforce.user__c`);
     res.json(rows);
